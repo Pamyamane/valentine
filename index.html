@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Will you be my Valentine? 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --rose:       #c9667a;
+      --rose-light: #e8a0ad;
+      --rose-dark:  #8b3a4a;
+      --gold:       #c9a96e;
+      --gold-light: #e8d5a3;
+      --cream:      #fdf6f0;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #0d0608;
+      font-family: 'Jost', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* ── Background ── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 18% 8%,  rgba(139,58,74,0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 84% 92%, rgba(100,30,45,0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, #1a080c 0%, #0d0608 100%);
+    }
+    .blob {
+      position: fixed; border-radius: 50%;
+      pointer-events: none; filter: blur(80px); z-index: 0;
+    }
+    .blob-a {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(201,102,122,0.1) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation: driftA 14s ease-in-out infinite alternate;
+    }
+    .blob-b {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation: driftB 18s ease-in-out infinite alternate;
+    }
+    @keyframes driftA { to { transform: translate(60px, 50px) scale(1.2); } }
+    @keyframes driftB { to { transform: translate(-50px, -40px) scale(1.2); } }
+
+    /* ── Particle canvas ── */
+    #particles {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── Center wrapper ── */
+    .scene {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      background: rgba(255,240,245,0.045);
+      backdrop-filter: blur(36px) saturate(1.5);
+      -webkit-backdrop-filter: blur(36px) saturate(1.5);
+      border: 1px solid rgba(201,166,110,0.2);
+      border-radius: 28px;
+      padding: 48px 44px 52px;
+      width: min(480px, 100%);
+      text-align: center;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 40px 100px rgba(0,0,0,0.7),
+        0 0 80px rgba(139,58,74,0.12);
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+    .card.show { opacity: 1; transform: none; }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,169,110,0.3), transparent);
+    }
+    .dot { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); opacity: 0.35; }
+    .dot.tl { top:18px; left:18px; }
+    .dot.tr { top:18px; right:18px; }
+    .dot.bl { bottom:18px; left:18px; }
+    .dot.br { bottom:18px; right:18px; }
+
+    /* ── Typography ── */
+    .eyebrow {
+      font-size: 0.6rem; font-weight: 300;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--gold); opacity: 0.75; margin-bottom: 24px;
+    }
+    .glyph {
+      font-size: 2.8rem; display: block; margin-bottom: 18px;
+      animation: breathe 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(201,102,122,0.55));
+    }
+    @keyframes breathe {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.08); filter: drop-shadow(0 0 32px rgba(201,102,122,0.85)); }
+    }
+    .headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      color: rgba(253,246,240,0.85);
+      line-height: 1.3; margin-bottom: 4px;
+    }
+    .name-line {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: clamp(1.9rem, 6vw, 2.8rem);
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 45%, var(--rose-light) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block; margin-bottom: 32px;
+    }
+    .divider {
+      width: 36px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 28px;
+    }
+
+    /* ── YES Button ── */
+    .btn-yes {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(140deg, #d4758a 0%, #a84058 60%, #8b3a4a 100%);
+      color: #fdf0f2;
+      border: none; border-radius: 100px;
+      padding: 16px 52px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 400; font-size: 0.82rem;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 28px rgba(139,58,74,0.5), 0 1px 0 rgba(255,255,255,0.12) inset;
+      position: relative; overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .btn-yes::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+      border-radius: inherit;
+    }
+    .btn-yes:active { transform: scale(0.96); }
+
+    /* ── NO Button (escaping) ── */
+    .no-zone {
+      position: relative;
+      height: 100px;
+      margin-top: 18px;
+      overflow: hidden;
+    }
+    .btn-no {
+      position: absolute;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: rgba(255,240,242,0.22);
+      border: 1px solid rgba(255,240,242,0.1);
+      border-radius: 100px;
+      padding: 13px 34px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300; font-size: 0.76rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap; user-select: none;
+      transition: left 0.2s cubic-bezier(0.34,1.56,0.64,1),
+                  top  0.2s cubic-bezier(0.34,1.56,0.64,1);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .taunt {
+      position: absolute;
+      bottom: -14px; left: 50%; transform: translateX(-50%);
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      color: rgba(201,169,110,0.45);
+      font-weight: 300; white-space: nowrap;
+      animation: fadeSlide 2.2s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes fadeSlide {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(6px); }
+      15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ── CELEBRATION PHASE ── */
+    #yes-card { display: none; }
+
+    .yh {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      font-size: clamp(2.6rem, 8vw, 4rem);
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, var(--gold-light), var(--rose-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      animation: enterPop 0.75s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes enterPop {
+      from { transform: scale(0.5); opacity: 0; }
+    }
+
+    .sub-yes {
+      font-size: 0.6rem; font-weight: 300;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--gold); opacity: 0.7;
+      margin-bottom: 24px;
+    }
+
+    .hearts {
+      display: flex; justify-content: center; gap: 14px;
+      font-size: 1.3rem; margin: 18px 0;
+    }
+    .hearts span {
+      display: inline-block;
+      filter: drop-shadow(0 0 8px rgba(201,102,122,0.6));
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .hearts span:nth-child(1) { animation-delay: 0.08s; }
+    .hearts span:nth-child(2) { animation-delay: 0.22s; font-size: 1.8rem; }
+    .hearts span:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes popIn {
+      from { transform: scale(0) rotate(-20deg); opacity: 0; }
+    }
+
+    .best-line {
+      font-size: 0.6rem; font-weight: 300;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(255,240,242,0.38);
+      margin-bottom: 8px;
+    }
+
+    .love-you {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      color: var(--rose-light);
+      display: block; margin-bottom: 28px;
+      opacity: 0; transform: translateY(14px);
+      animation: riseIn 0.7s cubic-bezier(0.16,1,0.3,1) 0.75s forwards;
+    }
+    @keyframes riseIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Dancing emoji stage ── */
+    .dance-stage {
+      position: relative;
+      display: flex; justify-content: center; align-items: flex-end;
+      gap: 8px;
+      height: 90px;
+      margin-top: 4px;
+      opacity: 0;
+      animation: riseIn 0.6s cubic-bezier(0.16,1,0.3,1) 1s forwards;
+    }
+    .dancer {
+      font-size: 2.6rem;
+      display: inline-block;
+      line-height: 1;
+      filter: drop-shadow(0 0 12px rgba(201,102,122,0.5));
+    }
+    .dancer.main  { font-size: 3.2rem; animation: dance 0.7s ease-in-out infinite alternate; }
+    .dancer.left  { animation: danceL 0.7s ease-in-out infinite alternate; animation-delay: 0.15s; }
+    .dancer.right { animation: danceR 0.7s ease-in-out infinite alternate; animation-delay: 0.3s; }
+    @keyframes dance {
+      0%   { transform: translateY(0) rotate(-6deg) scale(1); }
+      100% { transform: translateY(-18px) rotate(6deg) scale(1.08); }
+    }
+    @keyframes danceL {
+      0%   { transform: translateY(0) rotate(4deg) scale(0.9); }
+      100% { transform: translateY(-12px) rotate(-8deg) scale(1); }
+    }
+    @keyframes danceR {
+      0%   { transform: translateY(-8px) rotate(-4deg) scale(1); }
+      100% { transform: translateY(0) rotate(8deg) scale(0.9); }
+    }
+    .music-note {
+      position: absolute;
+      font-size: 1.1rem;
+      animation: floatNote 2s ease-in-out infinite;
+      opacity: 0;
+    }
+    .music-note.n1 { top: 0;  left: 12%; animation-delay: 0s;    }
+    .music-note.n2 { top: 4px; right: 14%; animation-delay: 0.6s; }
+    .music-note.n3 { top: 10px; left: 42%; animation-delay: 1.2s; }
+    @keyframes floatNote {
+      0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+      30%  { opacity: 0.7; }
+      100% { opacity: 0; transform: translateY(-40px) scale(0.6); }
+    }
+
+    /* ── Floating particles (CSS fallback) ── */
+    .floater {
+      position: fixed; pointer-events: none; z-index: 5;
+      font-size: 1.2rem; opacity: 0;
+      animation: floatUp linear forwards;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+      10%  { opacity: 0.9; }
+      90%  { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-90vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="blob blob-a"></div>
+<div class="blob blob-b"></div>
+<canvas id="particles"></canvas>
+
+<div class="scene">
+
+  <!-- ASK CARD -->
+  <div class="card" id="ask-card">
+    <div class="dot tl"></div><div class="dot tr"></div>
+    <div class="dot bl"></div><div class="dot br"></div>
+
+    <p class="eyebrow">A question for you</p>
+    <span class="glyph">♡</span>
+    <h1 class="headline">Will you be my Valentine,</h1>
+    <span class="name-line">Manikarnika?</span>
+    <div class="divider"></div>
+
+    <button class="btn-yes" onclick="sayYes()">Yes &nbsp;♡</button>
+
+    <div class="no-zone" id="no-zone">
+      <button class="btn-no" id="no-btn" onclick="escapeNo()" ontouchstart="escapeNo()">
+        No, maybe later
+        <span class="taunt" id="taunt" style="display:none"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- YES CARD -->
+  <div class="card" id="yes-card">
+    <div class="dot tl"></div><div class="dot tr"></div>
+    <div class="dot bl"></div><div class="dot br"></div>
+
+    <p class="eyebrow">She said yes ✦</p>
+    <span class="yh">Yhhhh!! 🎉</span>
+    <p class="sub-yes">Best decision ever</p>
+
+    <div class="hearts">
+      <span>♡</span>
+      <span>❤️</span>
+      <span>♡</span>
+    </div>
+    <div class="divider"></div>
+
+    <p class="best-line">with every beat of my heart</p>
+    <span class="love-you">I love you, Manikarnika ♡</span>
+
+    <!-- Dancing Emoji Stage -->
+    <div class="dance-stage">
+      <span class="music-note n1">♪</span>
+      <span class="music-note n2">♫</span>
+      <span class="music-note n3">♩</span>
+      <span class="dancer left">🥰</span>
+      <span class="dancer main">💃</span>
+      <span class="dancer right">🥳</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  /* ── Card entrance ── */
+  setTimeout(() => {
+    document.getElementById('ask-card').classList.add('show');
+  }, 100);
+
+  /* ── No button escape ── */
+  const taunts = [
+    "Nice try 😏", "Not today~", "Too slow!",
+    "Catch me 💨", "Nope!", "Try harder…",
+    "Shy? Me too 🫣", "Running away~"
+  ];
+  let bounces = 0;
+  let tauntTimer = null;
+
+  function escapeNo() {
+    const zone   = document.getElementById('no-zone');
+    const btn    = document.getElementById('no-btn');
+    const zW     = zone.offsetWidth;
+    const zH     = zone.offsetHeight;
+    const bW     = btn.offsetWidth;
+    const bH     = btn.offsetHeight;
+
+    const pad = 8;
+    const maxX = zW - bW - pad;
+    const maxY = zH - bH - pad;
+
+    const nx = Math.random() * maxX + pad;
+    const ny = Math.random() * maxY + pad;
+
+    btn.style.left = nx + 'px';
+    btn.style.top  = ny + 'px';
+
+    // Show taunt
+    const t = document.getElementById('taunt');
+    t.textContent = taunts[bounces % taunts.length];
+    t.style.display = 'block';
+    t.style.animation = 'none';
+    void t.offsetWidth; // reflow
+    t.style.animation = 'fadeSlide 2.2s ease forwards';
+    bounces++;
+
+    if (tauntTimer) clearTimeout(tauntTimer);
+    tauntTimer = setTimeout(() => { t.style.display = 'none'; }, 2300);
+  }
+
+  /* ── Yes button ── */
+  function sayYes() {
+    const askCard = document.getElementById('ask-card');
+    const yesCard = document.getElementById('yes-card');
+
+    askCard.classList.remove('show');
+    setTimeout(() => {
+      askCard.style.display = 'none';
+      yesCard.style.display = 'block';
+      setTimeout(() => yesCard.classList.add('show'), 50);
+      startParticles();
+      spawnFloaters();
+    }, 500);
+  }
+
+  /* ── Canvas particle system ── */
+  const canvas  = document.getElementById('particles');
+  const ctx     = canvas.getContext('2d');
+  const parts   = [];
+  let  running  = false;
+  let  spawnT   = 0;
+  const syms    = ['✦','✧','♡','✿','⋆','◈'];
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function newParticle() {
+    return {
+      x:       Math.random() * canvas.width,
+      y:       canvas.height + 20,
+      vx:      (Math.random() - 0.5) * 1.1,
+      vy:      -(Math.random() * 1.8 + 0.8),
+      alpha:   Math.random() * 0.5 + 0.3,
+      size:    Math.random() * 14 + 8,
+      sym:     syms[Math.floor(Math.random() * syms.length)],
+      hue:     Math.random() * 40 + 330,
+      life:    0,
+      maxLife: Math.random() * 180 + 120,
+      drift:   (Math.random() - 0.5) * 0.02,
+    };
+  }
+
+  function tickParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    spawnT++;
+    if (spawnT % 5 === 0) parts.push(newParticle());
+
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.life++;
+      p.x += p.vx + Math.sin(p.life * p.drift) * 0.5;
+      p.y += p.vy;
+      const a = p.alpha * (1 - Math.pow(p.life / p.maxLife, 2));
+      ctx.globalAlpha = a;
+      ctx.font = `${p.size}px serif`;
+      ctx.fillStyle = `hsl(${p.hue},80%,75%)`;
+      ctx.fillText(p.sym, p.x, p.y);
+      if (p.life >= p.maxLife) parts.splice(i, 1);
+    }
+    ctx.globalAlpha = 1;
+    if (running) requestAnimationFrame(tickParticles);
+  }
+
+  function startParticles() {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(tickParticles);
+  }
+
+  /* ── CSS floaters (big emojis) ── */
+  const floatSyms = ['💖','💗','✨','🌸','💕','⭐','🌺','💝'];
+  function spawnFloaters() {
+    for (let i = 0; i < 18; i++) {
+      setTimeout(() => {
+        const el  = document.createElement('div');
+        el.className = 'floater';
+        el.textContent = floatSyms[Math.floor(Math.random() * floatSyms.length)];
+        el.style.left     = Math.random() * 95 + 'vw';
+        el.style.bottom   = '-40px';
+        el.style.fontSize = (Math.random() * 18 + 14) + 'px';
+        const dur = Math.random() * 3 + 3.5;
+        el.style.animationDuration = dur + 's';
+        el.style.animationDelay    = '0s';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), dur * 1000 + 200);
+      }, i * 200);
+    }
+  }
+
+  /* ── Position No button center on load ── */
+  window.addEventListener('load', () => {
+    const zone = document.getElementById('no-zone');
+    const btn  = document.getElementById('no-btn');
+    const nx = (zone.offsetWidth  - btn.offsetWidth)  / 2;
+    const ny = (zone.offsetHeight - btn.offsetHeight) / 2;
+    btn.style.left = nx + 'px';
+    btn.style.top  = ny + 'px';
+  });
+</script>
+</body>
+</html>
